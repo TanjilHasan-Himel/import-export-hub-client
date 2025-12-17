@@ -1,22 +1,47 @@
 import { createBrowserRouter } from "react-router-dom";
 import MainLayout from "../layouts/MainLayout";
+import ErrorPage from "../pages/ErrorPage";
 import Home from "../pages/Home";
+import AllProducts from "../pages/AllProducts";
+import ProductDetails from "../pages/ProductDetails";
+import MyImports from "../pages/MyImports";
+import MyExports from "../pages/MyExports";
+import PrivateRoute from "./PrivateRoute";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <MainLayout />,
-    errorElement: <div className="p-10 text-white">404 Not Found</div>,
+    errorElement: <ErrorPage />,
     children: [
       { path: "/", element: <Home /> },
+      { path: "/all-products", element: <AllProducts /> },
 
-      // এগুলো এখন placeholder, পরে full page বানাবো
-      { path: "/products", element: <div className="text-white">All Products Page</div> },
-      { path: "/my-imports", element: <div className="text-white">My Imports (Private)</div> },
-      { path: "/my-exports", element: <div className="text-white">My Exports (Private)</div> },
-      { path: "/add-export", element: <div className="text-white">Add Export (Private)</div> },
-      { path: "/login", element: <div className="text-white">Login Page</div> },
-      { path: "/register", element: <div className="text-white">Register Page</div> },
+      // Protected routes (later তুমি auth যোগ করলে ready থাকবে)
+      {
+        path: "/product/:id",
+        element: (
+          <PrivateRoute>
+            <ProductDetails />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/my-imports",
+        element: (
+          <PrivateRoute>
+            <MyImports />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/my-exports",
+        element: (
+          <PrivateRoute>
+            <MyExports />
+          </PrivateRoute>
+        ),
+      },
     ],
   },
 ]);
