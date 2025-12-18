@@ -1,59 +1,44 @@
 import { useContext, useEffect, useState } from "react";
-import toast from "react-hot-toast";
+import useTitle from "../hooks/useTitle";
 import { AuthContext } from "../providers/AuthProvider";
-import { Link } from "react-router-dom";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 export default function MyImports() {
+  useTitle("My Imports");
   const { user } = useContext(AuthContext);
   const [items, setItems] = useState([]);
 
   useEffect(() => {
-    document.title = "ImportExportHub | My Imports";
-    (async () => {
-      const res = await fetch(`${API}/imports?email=${user.email}`);
+    const load = async () => {
+      const res = await fetch(`${API}/imports?email=${user?.email}`);
       const data = await res.json();
       setItems(Array.isArray(data) ? data : []);
-    })();
-  }, [user.email]);
-
-  const handleDelete = async (id) => {
-    try {
-      const res = await fetch(`${API}/imports/${id}`, { method: "DELETE" });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data?.message || "Delete failed");
-      toast.success("Deleted");
-      setItems((prev) => prev.filter((x) => x._id !== id));
-    } catch (e) {
-      toast.error(e.message);
-    }
-  };
+    };
+    if (user?.email) load();
+  }, [user?.email]);
 
   return (
-    <div className="space-y-5">
-      <h2 className="text-2xl font-extrabold text-white">My Imports</h2>
+    <div className="space-y-6">
+      <div className="card p-6">
+        <h1 className="text-2xl font-extrabold">My Imports</h1>
+        <p className="text-muted mt-1">Imports by: {user?.email}</p>
+      </div>
 
-      <div className="space-y-3">
-        {items.map((x) => (
-          <div key={x._id} className="card p-4 flex items-center justify-between gap-3">
-            <div>
-              <div className="text-white font-bold">{x.productName}</div>
-              <div className="text-white/70 text-sm">
-                Qty: {x.importedQty} • {new Date(x.importedAt).toLocaleString()}
-              </div>
+      <div className="grid gap-4">
+        {items.map((it) => (
+          <div key={it._id} className="card p-5 flex items-center justify-between gap-4">
+            <div className="min-w-0">
+              <p className="font-extrabold truncate">{it.title || it.productName}</p>
+              <p className="text-muted text-sm">
+                Imported Qty: {it.importQty ?? it.importedQty ?? 0}
+              </p>
             </div>
-            <div className="flex gap-2">
-              <Link className="btn" to={`/products/${x.productId}`}>
-                See Details
-              </Link>
-              <button className="btn" onClick={() => handleDelete(x._id)}>
-                Delete
-              </button>
+            <div className="text-sm text-muted">
+              {it.importedAt ? new Date(it.importedAt).toLocaleString() : ""}
             </div>
           </div>
         ))}
-        {items.length === 0 && <div className="card p-6 text-white/70">No imports yet.</div>}
       </div>
     </div>
   );

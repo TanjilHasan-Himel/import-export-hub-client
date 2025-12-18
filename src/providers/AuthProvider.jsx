@@ -1,22 +1,22 @@
-// client/src/providers/AuthProvider.jsx
 import { createContext, useEffect, useState } from "react";
 import {
   createUserWithEmailAndPassword,
+  GoogleAuthProvider,
+  onAuthStateChanged,
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
-  onAuthStateChanged,
   updateProfile,
-  sendPasswordResetEmail,
 } from "firebase/auth";
-
-import { auth, googleProvider } from "../firebase/firebase.config";
+import { auth } from "../firebase/firebase.config";
 
 export const AuthContext = createContext(null);
 
-const AuthProvider = ({ children }) => {
+export default function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const googleProvider = new GoogleAuthProvider();
 
   const createUser = (email, password) =>
     createUserWithEmailAndPassword(auth, email, password);
@@ -26,36 +26,32 @@ const AuthProvider = ({ children }) => {
 
   const googleSignIn = () => signInWithPopup(auth, googleProvider);
 
-  const logOut = () => signOut(auth);
-
   const updateUserProfile = (name, photoURL) =>
     updateProfile(auth.currentUser, { displayName: name, photoURL });
 
-  const resetPassword = (email) => sendPasswordResetEmail(auth, email);
+  const logOut = () => signOut(auth);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
+    const unsub = onAuthStateChanged(auth, (current) => {
+      setUser(current);
       setLoading(false);
     });
-
-    return () => unsubscribe();
+    return () => unsub();
   }, []);
 
-  const authInfo = {
-    user,
-    loading,
-    createUser,
-    signIn,
-    googleSignIn,
-    logOut,
-    updateUserProfile,
-    resetPassword,
-  };
-
   return (
-    <AuthContext.Provider value={authInfo}>{children}</AuthContext.Provider>
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        createUser,
+        signIn,
+        googleSignIn,
+        updateUserProfile,
+        logOut,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
   );
-};
-
-export default AuthProvider;
+}

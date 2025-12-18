@@ -7,7 +7,7 @@ export default function PrivateRoute({ children }) {
   const location = useLocation();
 
   if (loading) {
-    return <div className="card p-6 text-white/80">Loading...</div>;
+    return <div className="card p-6">Loading...</div>;
   }
 
   if (!user) {

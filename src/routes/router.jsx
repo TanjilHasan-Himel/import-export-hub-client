@@ -4,11 +4,9 @@ import ErrorPage from "../pages/ErrorPage";
 import Home from "../pages/Home";
 import AllProducts from "../pages/AllProducts";
 import ProductDetails from "../pages/ProductDetails";
-import MyImports from "../pages/MyImports";
-import MyExports from "../pages/MyExports";
-import AddExport from "../pages/AddExport";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
+import MyImports from "../pages/MyImports";
 import PrivateRoute from "./PrivateRoute";
 
 const router = createBrowserRouter([
@@ -20,43 +18,17 @@ const router = createBrowserRouter([
       { path: "/", element: <Home /> },
       { path: "/all-products", element: <AllProducts /> },
 
-      // ✅ Private (assignment requirement)
-      {
-        path: "/products/:id",
-        element: (
-          <PrivateRoute>
-            <ProductDetails />
-          </PrivateRoute>
-        ),
-      },
-      {
-        path: "/my-imports",
-        element: (
-          <PrivateRoute>
-            <MyImports />
-          </PrivateRoute>
-        ),
-      },
-      {
-        path: "/add-export",
-        element: (
-          <PrivateRoute>
-            <AddExport />
-          </PrivateRoute>
-        ),
-      },
-      {
-        path: "/my-exports",
-        element: (
-          <PrivateRoute>
-            <MyExports />
-          </PrivateRoute>
-        ),
+      // ✅ Details PUBLIC (login ছাড়া open হবে)
+      { path: "/products/:id"// element: <ProductDetails /> 
+
       },
 
-      // Auth
+      // ✅ Auth
       { path: "/login", element: <Login /> },
       { path: "/register", element: <Register /> },
+
+      // ✅ Private
+      { path: "/my-imports", element: <PrivateRoute><MyImports /></PrivateRoute> },
     ],
   },
 ]);

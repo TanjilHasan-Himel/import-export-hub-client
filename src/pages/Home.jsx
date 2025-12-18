@@ -1,110 +1,144 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import useTitle from "../hooks/useTitle";
+import HeroVideo from "../components/HeroVideo";
+import toast from "react-hot-toast";
 
-const Home = () => {
-    useTitle("Global Logistics Hub");
-    const [products, setProducts] = useState([]);
+const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
-    useEffect(() => {
-        fetch('http://localhost:5000/products?sort=latest')
-            .then(res => res.json())
-            .then(data => setProducts(data.slice(0, 6)));
-    }, []);
+function ProductCard({ p }) {
+  const title = p.name || p.title || "Untitled";
+  const img = p.image || p.coverPhoto || "/images/hero-1.jpg";
+  const country = p.originCountry || p.category || "Unknown";
+  const rating = p.rating ?? 0;
+  const qty = p.quantity ?? 0;
+  const price = p.price ?? 0;
+  const id = p._id || p.id;
 
-    return (
-        <div className="bg-slate-50 min-h-screen">
-            {/* Professional Hero Section */}
-            <div className="relative h-[500px] w-full bg-cover bg-center" style={{backgroundImage: "url('https://images.unsplash.com/photo-1494412574643-35d324698420?q=80&w=2070&auto=format&fit=crop')"}}>
-                <div className="absolute inset-0 bg-corporate-900/80"></div>
-                <div className="relative z-10 container mx-auto px-6 h-full flex flex-col justify-center items-start text-white">
-                    <span className="bg-secondary text-xs font-bold px-2 py-1 uppercase tracking-widest mb-4">Global Trade Platform</span>
-                    <h1 className="text-5xl md:text-6xl font-bold leading-tight mb-6">
-                        Seamless Import <br/> & Export Solutions.
-                    </h1>
-                    <p className="max-w-xl text-gray-300 text-lg mb-8">
-                        Connect with 10,000+ verified suppliers. Manage your entire supply chain from a single dashboard with real-time inventory tracking.
-                    </p>
-                    <div className="flex gap-4">
-                        <Link to="/all-products" className="btn btn-secondary border-none rounded-sm px-8 uppercase font-bold text-white hover:bg-white hover:text-corporate-900 transition-colors">Find Products</Link>
-                        <Link to="/add-export" className="btn btn-outline border-white text-white rounded-sm px-8 uppercase font-bold hover:bg-white hover:text-corporate-900 hover:border-white">Start Selling</Link>
-                    </div>
-                </div>
-            </div>
+  return (
+    <div className="cardx overflow-hidden">
+      <img className="h-44 w-full object-cover" src={img} alt={title} />
+      <div className="p-5">
+        <h3 className="font-extrabold text-lg">{title}</h3>
+        <p className="text-sm text-base-content/70 mt-1">
+          {country} • Rating {rating} • Qty {qty}
+        </p>
+        <p className="font-bold mt-2">৳ {price}</p>
 
-            {/* Trusted By Banner */}
-            <div className="bg-white border-b py-6">
-                <div className="container mx-auto px-6 flex justify-between items-center opacity-50 grayscale hover:grayscale-0 transition-all duration-500 overflow-x-auto">
-                    {/* Placeholder Logos for "Trust" effect */}
-                    <span className="text-xl font-bold italic">MAERSK</span>
-                    <span className="text-xl font-bold italic">CMA CGM</span>
-                    <span className="text-xl font-bold italic">EVERGREEN</span>
-                    <span className="text-xl font-bold italic">HAPAG-LLOYD</span>
-                    <span className="text-xl font-bold italic">MSC</span>
-                </div>
-            </div>
+        <Link className="btn btn-outline btn-sm mt-4" to={`/products/${id}`}>
+          See Details
+        </Link>
+      </div>
+    </div>
+  );
+}
 
-            {/* Latest Shipments Grid */}
-            <div className="container mx-auto px-6 py-20">
-                <div className="flex justify-between items-end mb-10 border-b pb-4 border-gray-200">
-                    <div>
-                        <h2 className="text-3xl font-bold text-slate-800">Latest Cargo Listings</h2>
-                        <p className="text-slate-500 mt-1">Freshly added inventory available for immediate export.</p>
-                    </div>
-                    <Link to="/all-products" className="text-secondary font-bold hover:underline">View All Cargo &rarr;</Link>
-                </div>
+export default function Home() {
+  const [latest, setLatest] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {products.map(product => (
-                        <div key={product._id} className="group bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300">
-                            <div className="relative h-64 overflow-hidden">
-                                <img src={product.productImage} alt={product.productName} className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500" />
-                                <div className="absolute top-4 right-4 bg-white/90 backdrop-blur text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide text-slate-800 shadow-sm">
-                                    {product.origin}
-                                </div>
-                            </div>
-                            <div className="p-6">
-                                <div className="flex justify-between items-start mb-4">
-                                    <div>
-                                        <h3 className="text-xl font-bold text-slate-900 mb-1 group-hover:text-secondary transition-colors">{product.productName}</h3>
-                                        <div className="flex items-center gap-1 text-amber-400 text-sm">
-                                            <span>★★★★★</span>
-                                            <span className="text-slate-400 ml-1 text-xs">({product.rating}.0)</span>
-                                        </div>
-                                    </div>
-                                    <div className="text-right">
-                                        <p className="text-2xl font-bold text-slate-900">${product.price}</p>
-                                        <p className="text-xs text-slate-500">per unit</p>
-                                    </div>
-                                </div>
-                                
-                                <div className="bg-slate-50 p-3 rounded text-sm text-slate-600 mb-6 flex justify-between">
-                                    <span>Stock Available:</span>
-                                    <span className="font-bold text-slate-900">{product.availableQuantity} units</span>
-                                </div>
+  useEffect(() => {
+    document.title = "ImportExportHub | Home";
+  }, []);
 
-                                <Link to={`/product/${product._id}`} className="btn btn-primary w-full rounded-sm uppercase font-bold text-xs tracking-wider">
-                                    View Manifest Details
-                                </Link>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
+  useEffect(() => {
+    const load = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(`${API}/products?limit=6&sort=latest`);
+        const data = await res.json();
+        if (!Array.isArray(data)) throw new Error("Invalid data");
+        setLatest(data);
+      } catch (e) {
+        toast.error("Failed to load latest products");
+        setLatest([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, []);
 
-            {/* Newsletter Section */}
-            <div className="bg-corporate-900 py-20 text-white">
-                <div className="container mx-auto px-6 text-center">
-                    <h2 className="text-3xl font-bold mb-4">Subscribe to Market Intelligence</h2>
-                    <p className="text-slate-300 mb-8 max-w-2xl mx-auto">Get weekly reports on global shipping rates, tariff updates, and new high-demand export categories.</p>
-                    <div className="join w-full max-w-md">
-                        <input className="input input-bordered join-item w-full text-slate-900" placeholder="Enter corporate email" />
-                        <button className="btn btn-secondary join-item px-8">Subscribe</button>
-                    </div>
-                </div>
-            </div>
+  return (
+    <div className="space-y-10">
+      <HeroVideo />
+
+      {/* Latest */}
+      <section className="space-y-4">
+        <div className="flex items-end justify-between gap-3">
+          <div>
+            <h2 className="text-2xl md:text-3xl font-extrabold">
+              Latest Products
+            </h2>
+            <p className="text-base-content/70 mt-1">
+              Most recent products, sorted by newest first.
+            </p>
+          </div>
+          <Link className="btn btn-outline" to="/all-products">
+            View All
+          </Link>
         </div>
-    );
-};
 
-export default Home;
+        {loading ? (
+          <div className="cardx p-6">Loading...</div>
+        ) : latest.length === 0 ? (
+          <div className="cardx p-6">
+            No products found. (Check MongoDB products collection)
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {latest.map((p) => (
+              <ProductCard key={p._id || p.id} p={p} />
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* Features */}
+      <section className="grid md:grid-cols-3 gap-5">
+        <div className="cardx p-6">
+          <h3 className="font-extrabold text-lg">Fast Search</h3>
+          <p className="text-base-content/70 mt-2 text-sm">
+            Find products quickly with clean filtering & sorting.
+          </p>
+        </div>
+        <div className="cardx p-6">
+          <h3 className="font-extrabold text-lg">Trusted Data</h3>
+          <p className="text-base-content/70 mt-2 text-sm">
+            Consistent UI, clear product info, and secure user flows.
+          </p>
+        </div>
+        <div className="cardx p-6">
+          <h3 className="font-extrabold text-lg">Smooth Workflow</h3>
+          <p className="text-base-content/70 mt-2 text-sm">
+            Export, import, and manage quantities without confusion.
+          </p>
+        </div>
+      </section>
+
+      {/* How it works */}
+      <section className="cardx p-6 md:p-10">
+        <h3 className="font-extrabold text-2xl">How it works</h3>
+        <div className="mt-6 grid md:grid-cols-3 gap-5">
+          <div className="cardx p-5">
+            <p className="font-bold">1) Browse</p>
+            <p className="text-base-content/70 text-sm mt-2">
+              Explore all products with essential trade info.
+            </p>
+          </div>
+          <div className="cardx p-5">
+            <p className="font-bold">2) Import</p>
+            <p className="text-base-content/70 text-sm mt-2">
+              Import with quantity limit protection.
+            </p>
+          </div>
+          <div className="cardx p-5">
+            <p className="font-bold">3) Manage</p>
+            <p className="text-base-content/70 text-sm mt-2">
+              Track imports/exports with update & delete controls.
+            </p>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
