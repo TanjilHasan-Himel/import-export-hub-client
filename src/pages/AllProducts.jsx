@@ -1,91 +1,73 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import toast from "react-hot-toast";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
-function ProductCard({ p }) {
-  return (
-    <div className="card p-4 flex flex-col">
-      <img
-        src={p.image}
-        alt={p.name}
-        className="h-44 w-full object-cover rounded-xl border border-white/10"
-      />
-      <div className="mt-4 flex-1">
-        <h3 className="text-white font-extrabold text-lg">{p.name}</h3>
-        <p className="text-white/70 text-sm mt-1">
-          {p.originCountry} • Rating {p.rating} • Qty {p.quantity}
-        </p>
-        <p className="text-white font-bold mt-2">৳ {p.price}</p>
-      </div>
-      <Link className="btn mt-4" to={`/products/${p._id}`}>
-        See Details
-      </Link>
-    </div>
-  );
-}
+const pickImage = (p) => p.coverPhoto || p.image || p.productImage || "";
+const pickName = (p) => p.title || p.name || p.productName || "Untitled";
+const pickOrigin = (p) => p.originCountry || p.origin || p.country || "Unknown";
 
 export default function AllProducts() {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
+  const [items, setItems] = useState([]);
+  const [q, setQ] = useState("");
 
   useEffect(() => {
     document.title = "ImportExportHub | All Products";
+    (async () => {
+      const res = await fetch(`${API}/products?sort=latest`);
+      const data = await res.json();
+      setItems(Array.isArray(data) ? data : []);
+    })();
   }, []);
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        setLoading(true);
-        const url =
-          search.trim().length > 0
-            ? `${API}/products?search=${encodeURIComponent(search)}`
-            : `${API}/products`;
-        const res = await fetch(url);
-        const data = await res.json();
-        setProducts(data);
-      } catch (e) {
-        toast.error("Failed to load products");
-      } finally {
-        setLoading(false);
-      }
-    };
-    load();
-  }, [search]);
+  const filtered = useMemo(() => {
+    const s = q.trim().toLowerCase();
+    if (!s) return items;
+    return items.filter((p) =>
+      (pickName(p) + " " + (p.category || "") + " " + pickOrigin(p))
+        .toLowerCase()
+        .includes(s)
+    );
+  }, [items, q]);
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+    <div className="space-y-5">
+      <div className="flex items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl md:text-3xl font-extrabold text-white">
+          <h2 className="text-2xl md:text-3xl font-extrabold text-white">
             All Products
-          </h1>
-          <p className="text-white/70 mt-1">
-            Search and explore all listed products.
-          </p>
+          </h2>
+          <p className="text-white/70 mt-1">Browse everything.</p>
         </div>
-
         <input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full md:w-[360px] px-4 py-3 rounded-xl bg-[#0b0f17] border border-white/10 outline-none focus:border-green-400 text-white"
-          placeholder="Search by product name..."
+          className="btn"
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder="Search..."
         />
       </div>
 
-      {loading ? (
-        <div className="card p-6 text-white/80">Loading...</div>
-      ) : products.length === 0 ? (
-        <div className="card p-6 text-white/80">No products found.</div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {products.map((p) => (
-            <ProductCard key={p._id} p={p} />
-          ))}
-        </div>
-      )}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        {filtered.map((p) => (
+          <div key={p._id} className="card p-4 flex flex-col">
+            <img
+              src={pickImage(p)}
+              alt={pickName(p)}
+              className="h-44 w-full object-cover rounded-xl border border-white/10"
+            />
+            <div className="mt-4 flex-1">
+              <h3 className="text-white font-extrabold text-lg">{pickName(p)}</h3>
+              <p className="text-white/70 text-sm mt-1">
+                {pickOrigin(p)} • Rating {p.rating ?? "N/A"} • Qty {p.quantity ?? 0}
+              </p>
+              <p className="text-white font-bold mt-2">৳ {p.price ?? 0}</p>
+            </div>
+            <Link className="btn mt-4" to={`/products/${p._id}`}>
+              See Details
+            </Link>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

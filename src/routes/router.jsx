@@ -6,6 +6,9 @@ import AllProducts from "../pages/AllProducts";
 import ProductDetails from "../pages/ProductDetails";
 import MyImports from "../pages/MyImports";
 import MyExports from "../pages/MyExports";
+import AddExport from "../pages/AddExport";
+import Login from "../pages/Login";
+import Register from "../pages/Register";
 import PrivateRoute from "./PrivateRoute";
 
 const router = createBrowserRouter([
@@ -17,9 +20,9 @@ const router = createBrowserRouter([
       { path: "/", element: <Home /> },
       { path: "/all-products", element: <AllProducts /> },
 
-      // Protected routes (later তুমি auth যোগ করলে ready থাকবে)
+      // ✅ Private (assignment requirement)
       {
-        path: "/product/:id",
+        path: "/products/:id",
         element: (
           <PrivateRoute>
             <ProductDetails />
@@ -35,6 +38,14 @@ const router = createBrowserRouter([
         ),
       },
       {
+        path: "/add-export",
+        element: (
+          <PrivateRoute>
+            <AddExport />
+          </PrivateRoute>
+        ),
+      },
+      {
         path: "/my-exports",
         element: (
           <PrivateRoute>
@@ -42,6 +53,10 @@ const router = createBrowserRouter([
           </PrivateRoute>
         ),
       },
+
+      // Auth
+      { path: "/login", element: <Login /> },
+      { path: "/register", element: <Register /> },
     ],
   },
 ]);

@@ -1,92 +1,59 @@
 import { useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { AuthContext } from "../providers/AuthProvider";
+import { Link } from "react-router-dom";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 export default function MyImports() {
   const { user } = useContext(AuthContext);
   const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user?.email) return;
+    document.title = "ImportExportHub | My Imports";
+    (async () => {
+      const res = await fetch(`${API}/imports?email=${user.email}`);
+      const data = await res.json();
+      setItems(Array.isArray(data) ? data : []);
+    })();
+  }, [user.email]);
 
-    setLoading(true);
-    fetch(`${API}/imports?email=${encodeURIComponent(user.email)}`)
-      .then((r) => {
-        if (!r.ok) throw new Error("Failed to load imports");
-        return r.json();
-      })
-      .then((data) => {
-        setItems(data);
-        setLoading(false);
-      })
-      .catch((e) => {
-        toast.error(e.message || "Error");
-        setLoading(false);
-      });
-  }, [user?.email]);
+  const handleDelete = async (id) => {
+    try {
+      const res = await fetch(`${API}/imports/${id}`, { method: "DELETE" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.message || "Delete failed");
+      toast.success("Deleted");
+      setItems((prev) => prev.filter((x) => x._id !== id));
+    } catch (e) {
+      toast.error(e.message);
+    }
+  };
 
   return (
-    <div className="bg-grid min-h-[calc(100vh-72px)]">
-      <div className="container-max py-10">
-        <div className="flex items-end justify-between gap-4 mb-5">
-          <div>
-            <h1 className="text-2xl font-extrabold">My Imports</h1>
-            <p className="text-white/70 text-sm mt-1">
-              Only your imported products are shown here.
-            </p>
-          </div>
-          <div className="text-white/60 text-sm">
-            Total: <span className="font-bold text-white">{items.length}</span>
-          </div>
-        </div>
+    <div className="space-y-5">
+      <h2 className="text-2xl font-extrabold text-white">My Imports</h2>
 
-        <div className="card overflow-hidden">
-          {loading ? (
-            <div className="p-6">Loading...</div>
-          ) : items.length === 0 ? (
-            <div className="p-6">No imports yet.</div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left">
-                <thead className="bg-white/5 border-b border-white/10">
-                  <tr className="text-white/80 text-sm">
-                    <th className="p-4">Product</th>
-                    <th className="p-4">Qty</th>
-                    <th className="p-4">Price</th>
-                    <th className="p-4">Imported At</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {items.map((it) => (
-                    <tr key={it._id} className="border-b border-white/10">
-                      <td className="p-4">
-                        <div className="flex items-center gap-3">
-                          <img
-                            src={it.productImage || "/images/hero-poster.jpg"}
-                            className="h-10 w-14 rounded-lg object-cover border border-white/10"
-                            alt="img"
-                          />
-                          <div>
-                            <p className="font-bold">{it.productName || "—"}</p>
-                            <p className="text-white/60 text-xs">{it.productOrigin || ""}</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="p-4 font-bold">{it.importedQty}</td>
-                      <td className="p-4">${it.productPrice ?? "—"}</td>
-                      <td className="p-4 text-white/70 text-sm">
-                        {it.importedAt ? new Date(it.importedAt).toLocaleString() : "—"}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+      <div className="space-y-3">
+        {items.map((x) => (
+          <div key={x._id} className="card p-4 flex items-center justify-between gap-3">
+            <div>
+              <div className="text-white font-bold">{x.productName}</div>
+              <div className="text-white/70 text-sm">
+                Qty: {x.importedQty} • {new Date(x.importedAt).toLocaleString()}
+              </div>
             </div>
-          )}
-        </div>
+            <div className="flex gap-2">
+              <Link className="btn" to={`/products/${x.productId}`}>
+                See Details
+              </Link>
+              <button className="btn" onClick={() => handleDelete(x._id)}>
+                Delete
+              </button>
+            </div>
+          </div>
+        ))}
+        {items.length === 0 && <div className="card p-6 text-white/70">No imports yet.</div>}
       </div>
     </div>
   );

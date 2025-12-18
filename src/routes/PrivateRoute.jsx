@@ -7,11 +7,7 @@ export default function PrivateRoute({ children }) {
   const location = useLocation();
 
   if (loading) {
-    return (
-      <div className="min-h-[60vh] flex items-center justify-center text-white">
-        <div className="card px-6 py-4">Loading...</div>
-      </div>
-    );
+    return <div className="card p-6 text-white/80">Loading...</div>;
   }
 
   if (!user) {
