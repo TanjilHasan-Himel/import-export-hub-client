@@ -1,48 +1,30 @@
+import { Link, NavLink } from "react-router-dom";
 import { useContext } from "react";
-import { NavLink, Link } from "react-router-dom";
-import toast from "react-hot-toast";
 import { AuthContext } from "../providers/AuthProvider";
-import useTheme from "../hooks/useTheme";
 
-const linkClass = ({ isActive }) =>
-  `px-3 py-2 rounded-xl text-sm font-bold transition ${
-    isActive ? "bg-black/10 dark:bg-white/10 border border-black/10 dark:border-white/15" : "hover:bg-black/10 dark:hover:bg-white/10"
-  }`;
+const navClass = ({ isActive }) =>
+  `px-3 py-2 rounded-lg font-semibold ${isActive ? "bg-black/5 dark:bg-white/10" : ""}`;
 
 export default function Navbar() {
   const { user, logOut } = useContext(AuthContext);
-  const { theme, toggle } = useTheme();
-
-  const handleLogout = async () => {
-    try {
-      await logOut();
-      toast.success("Logged out");
-    } catch (e) {
-      toast.error(e?.message || "Logout failed");
-    }
-  };
 
   return (
-    <header className="sticky top-0 z-50 border-b border-black/10 dark:border-white/10 bg-white/70 dark:bg-[#070A10]/70 backdrop-blur">
-      <div className="container-max flex items-center justify-between py-3">
-        <Link to="/" className="flex items-center gap-2">
-          <img src="/vite.svg" className="h-7 w-7" alt="logo" />
-          <span className="font-extrabold tracking-wide">
-            ImportExportHub
-          </span>
+    <div className="w-full border-b border-black/10 dark:border-white/10 bg-white/70 dark:bg-black/30 backdrop-blur">
+      <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+        <Link to="/" className="flex items-center gap-2 font-extrabold">
+          <span className="text-lg">⚡</span>
+          <span>ImportExportHub</span>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-2">
-          <NavLink to="/all-products" className={linkClass}>All Products</NavLink>
-          <NavLink to="/add-export" className={linkClass}>Add Export</NavLink>
-          <NavLink to="/my-exports" className={linkClass}>My Exports</NavLink>
-          <NavLink to="/my-imports" className={linkClass}>My Imports</NavLink>
-        </nav>
+        <div className="hidden md:flex items-center gap-2">
+          <NavLink to="/all-products" className={navClass}>All Products</NavLink>
+          <NavLink to="/add-export" className={navClass}>Add Export</NavLink>
+          <NavLink to="/my-exports" className={navClass}>My Exports</NavLink>
+          <NavLink to="/my-imports" className={navClass}>My Imports</NavLink>
+        </div>
 
         <div className="flex items-center gap-2">
-          <button className="btn" onClick={toggle} title="Toggle theme">
-            {theme === "dark" ? "Light" : "Dark"}
-          </button>
+          <ThemeToggle />
 
           {!user ? (
             <>
@@ -51,17 +33,34 @@ export default function Navbar() {
             </>
           ) : (
             <>
-              <button className="btn" onClick={handleLogout}>Logout</button>
-              <img
-                src={user.photoURL || "https://i.ibb.co/0jZQZ7W/user.png"}
-                className="h-10 w-10 rounded-full border border-black/10 dark:border-white/20 object-cover"
-                alt="user"
-                title={user.displayName || user.email}
-              />
+              <div className="flex items-center gap-2">
+                <img
+                  src={user.photoURL || "https://i.ibb.co/0jZQZ7W/user.png"}
+                  alt="user"
+                  className="w-9 h-9 rounded-full border border-black/10 dark:border-white/10"
+                />
+              </div>
+              <button className="btn" onClick={logOut}>Logout</button>
             </>
           )}
         </div>
       </div>
-    </header>
+    </div>
+  );
+}
+
+function ThemeToggle() {
+  const toggle = () => {
+    const root = document.documentElement;
+    const cur = root.getAttribute("data-theme") || "light";
+    const next = cur === "light" ? "night" : "light";
+    root.setAttribute("data-theme", next);
+    localStorage.setItem("theme", next);
+  };
+
+  return (
+    <button className="btn" onClick={toggle}>
+      Dark
+    </button>
   );
 }

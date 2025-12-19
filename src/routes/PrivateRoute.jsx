@@ -6,9 +6,7 @@ export default function PrivateRoute({ children }) {
   const { user, loading } = useContext(AuthContext);
   const location = useLocation();
 
-  if (loading) {
-    return <div className="card p-6">Loading...</div>;
-  }
+  if (loading) return <div className="card p-6">Loading...</div>;
 
   if (!user) {
     return <Navigate to="/login" state={{ from: location.pathname }} replace />;

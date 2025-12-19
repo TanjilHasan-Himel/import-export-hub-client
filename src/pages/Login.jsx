@@ -8,27 +8,26 @@ export default function Login() {
   useTitle("Login");
   const { signIn, googleSignIn } = useContext(AuthContext);
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [pass, setPass] = useState("");
   const nav = useNavigate();
-  const location = useLocation();
+  const loc = useLocation();
+  const from = loc.state?.from || "/";
 
-  const from = location.state?.from || "/";
-
-  const handleLogin = async (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
     try {
-      await signIn(email, password);
-      toast.success("Logged in");
+      await signIn(email, pass);
+      toast.success("Logged in!");
       nav(from, { replace: true });
     } catch (err) {
       toast.error(err?.message || "Login failed");
     }
   };
 
-  const handleGoogle = async () => {
+  const onGoogle = async () => {
     try {
       await googleSignIn();
-      toast.success("Logged in");
+      toast.success("Logged in with Google!");
       nav(from, { replace: true });
     } catch (err) {
       toast.error(err?.message || "Google login failed");
@@ -36,20 +35,19 @@ export default function Login() {
   };
 
   return (
-    <div className="max-w-md mx-auto card p-6 md:p-8">
+    <div className="max-w-md mx-auto card p-6">
       <h1 className="text-2xl font-extrabold">Login</h1>
-      <p className="text-muted mt-1">Access private pages (Add Export / My Imports / My Exports).</p>
 
-      <form onSubmit={handleLogin} className="mt-5 space-y-3">
-        <input className="inp" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" />
-        <input className="inp" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" type="password" />
-        <button className="btn btn-primary w-full" type="submit">Login</button>
+      <form onSubmit={onSubmit} className="mt-5 space-y-3">
+        <input className="inp" placeholder="Email" value={email} onChange={(e)=>setEmail(e.target.value)} />
+        <input className="inp" placeholder="Password" type="password" value={pass} onChange={(e)=>setPass(e.target.value)} />
+        <button className="btn btn-primary w-full">Login</button>
       </form>
 
-      <button className="btn w-full mt-3" onClick={handleGoogle}>Continue with Google</button>
+      <button className="btn w-full mt-3" onClick={onGoogle}>Continue with Google</button>
 
-      <p className="text-sm text-muted mt-4">
-        New here? <Link className="underline" to="/register">Create an account</Link>
+      <p className="text-muted mt-4 text-sm">
+        New here? <Link className="underline" to="/register">Register</Link>
       </p>
     </div>
   );

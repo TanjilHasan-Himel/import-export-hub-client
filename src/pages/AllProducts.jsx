@@ -4,16 +4,34 @@ import useTitle from "../hooks/useTitle";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
+// ✅ normalize: server data যেভাবেই আসুক (title/name, coverPhoto/image, quantity/qty)
+const normalizeProduct = (p) => ({
+  _id: p?._id || p?.id,
+  title: p?.title || p?.name || p?.productName || "Untitled",
+  coverPhoto: p?.coverPhoto || p?.image || p?.productImage || "",
+  category: p?.category || p?.type || "General",
+  rating: p?.rating ?? "N/A",
+  quantity: p?.quantity ?? p?.qty ?? 0,
+  price: p?.price ?? 0,
+});
+
 export default function AllProducts() {
   useTitle("All Products");
   const [items, setItems] = useState([]);
   const [q, setQ] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const load = async () => {
-      const res = await fetch(`${API}/products?sort=latest`);
-      const data = await res.json();
-      setItems(Array.isArray(data) ? data : []);
+      try {
+        setLoading(true);
+        const res = await fetch(`${API}/products?sort=latest`);
+        const data = await res.json();
+        const arr = Array.isArray(data) ? data.map(normalizeProduct) : [];
+        setItems(arr.filter((x) => x._id));
+      } finally {
+        setLoading(false);
+      }
     };
     load();
   }, []);
@@ -21,18 +39,18 @@ export default function AllProducts() {
   const filtered = useMemo(() => {
     const s = q.trim().toLowerCase();
     if (!s) return items;
-    return items.filter((p) => (p.title || "").toLowerCase().includes(s));
+    return items.filter((p) => p.title.toLowerCase().includes(s));
   }, [items, q]);
 
   return (
     <div className="space-y-6">
       <div className="card p-6">
         <h1 className="text-2xl font-extrabold">All Products</h1>
-        <p className="text-muted mt-1">Search by product title.</p>
+        <p className="text-muted mt-1">Search by title.</p>
 
-        <div className="mt-4">
+        <div className="mt-4 flex gap-3">
           <input
-            className="inp"
+            className="inp flex-1"
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Search products..."
@@ -40,25 +58,32 @@ export default function AllProducts() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {filtered.map((p) => (
-          <div key={p._id} className="card p-4 flex flex-col">
-            <img
-              src={p.coverPhoto}
-              alt={p.title}
-              className="h-44 w-full object-cover rounded-xl border border-black/10 dark:border-white/10"
-            />
-            <div className="mt-4 flex-1">
-              <h3 className="font-extrabold text-lg">{p.title}</h3>
-              <p className="text-muted text-sm mt-1">
-                {p.category || "General"} • Rating {p.rating ?? "N/A"} • Qty {p.quantity ?? 0}
-              </p>
-              <p className="font-extrabold mt-2">৳ {p.price ?? 0}</p>
+      {loading ? (
+        <div className="card p-6">Loading...</div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {filtered.map((p) => (
+            <div key={p._id} className="card p-4 flex flex-col">
+              <img
+                src={p.coverPhoto || "https://i.ibb.co/0jZQZ7W/user.png"}
+                alt={p.title}
+                className="h-44 w-full object-cover rounded-xl border border-black/10 dark:border-white/10"
+              />
+              <div className="mt-4 flex-1">
+                <h3 className="font-extrabold text-lg">{p.title}</h3>
+                <p className="text-muted text-sm mt-1">
+                  {p.category} • Rating {p.rating} • Qty {p.quantity}
+                </p>
+                <p className="font-extrabold mt-2">৳ {p.price}</p>
+              </div>
+
+              <Link className="btn mt-4" to={`/products/${p._id}`}>
+                See Details
+              </Link>
             </div>
-            <Link className="btn mt-4" to={`/products/${p._id}`}>See Details</Link>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
