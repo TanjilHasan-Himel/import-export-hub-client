@@ -23,11 +23,17 @@ export default function AddExport() {
   const onSubmit = async (e) => {
     e.preventDefault();
     try {
+      const toNumber = (v) => {
+        const cleaned = String(v ?? "").replace(/[^0-9.]/g, "");
+        const n = parseFloat(cleaned);
+        return Number.isFinite(n) ? n : 0;
+      };
+
       const payload = {
         ...form,
-        price: Number(form.price),
-        rating: Number(form.rating),
-        quantity: Number(form.quantity),
+        price: toNumber(form.price),
+        rating: toNumber(form.rating),
+        quantity: Math.max(0, Math.floor(toNumber(form.quantity))),
         exporterEmail: user?.email,
         createdAt: new Date().toISOString(),
       };
@@ -55,10 +61,10 @@ export default function AddExport() {
       <form onSubmit={onSubmit} className="mt-5 grid md:grid-cols-2 gap-3">
         <input className="inp" placeholder="Product Name" value={form.title} onChange={(e)=>onChange("title", e.target.value)} />
         <input className="inp" placeholder="Product Image URL" value={form.coverPhoto} onChange={(e)=>onChange("coverPhoto", e.target.value)} />
-        <input className="inp" placeholder="Price" value={form.price} onChange={(e)=>onChange("price", e.target.value)} />
+        <input className="inp" placeholder="Price" inputMode="decimal" value={form.price} onChange={(e)=>onChange("price", e.target.value)} />
         <input className="inp" placeholder="Origin Country" value={form.originCountry} onChange={(e)=>onChange("originCountry", e.target.value)} />
-        <input className="inp" placeholder="Rating" value={form.rating} onChange={(e)=>onChange("rating", e.target.value)} />
-        <input className="inp" placeholder="Available Quantity" value={form.quantity} onChange={(e)=>onChange("quantity", e.target.value)} />
+        <input className="inp" placeholder="Rating" inputMode="decimal" value={form.rating} onChange={(e)=>onChange("rating", e.target.value)} />
+        <input className="inp" placeholder="Available Quantity" inputMode="numeric" value={form.quantity} onChange={(e)=>onChange("quantity", e.target.value)} />
         <textarea className="inp md:col-span-2" placeholder="Description" value={form.description} onChange={(e)=>onChange("description", e.target.value)} />
         <button className="btn btn-primary md:col-span-2">Add Export/Product</button>
       </form>

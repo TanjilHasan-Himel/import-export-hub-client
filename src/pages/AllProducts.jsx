@@ -62,11 +62,11 @@ export default function AllProducts() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {filtered.map((p) => (
-            <div key={p._id} className="card p-4 flex flex-col">
+            <div key={p._id} className="card p-4 flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:ring-1 hover:ring-primary/30">
               <img
                 src={p.coverPhoto || "https://i.ibb.co/0jZQZ7W/user.png"}
                 alt={p.title}
-                className="h-44 w-full object-cover rounded-xl border border-black/10 dark:border-white/10"
+                className="h-44 w-full object-cover rounded-xl border border-black/10 dark:border-white/10 transition-transform duration-300 group-hover:scale-[1.02]"
               />
               <div className="mt-4 flex-1">
                 <h3 className="font-extrabold text-lg">{p.title}</h3>

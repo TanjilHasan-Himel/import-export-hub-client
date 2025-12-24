@@ -41,9 +41,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <p className="text-muted text-sm mt-8">
-          © {new Date().getFullYear()} ImportExportHub — Built for Assignment.
-        </p>
+        <p className="text-muted text-sm mt-8">© {new Date().getFullYear()} ImportExportHub</p>
       </div>
     </footer>
   );

@@ -59,8 +59,9 @@ export default function MyImports() {
             <thead>
               <tr>
                 <th>Product</th>
+                <th>Price</th>
+                <th>Rating</th>
                 <th>Qty</th>
-                <th>Date</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -82,10 +83,9 @@ export default function MyImports() {
                       </div>
                     </div>
                   </td>
+                  <td className="font-bold">৳ {it.productPrice ?? 0}</td>
+                  <td className="">{it.productRating ?? "N/A"}</td>
                   <td className="font-bold">{it.importedQty ?? 0}</td>
-                  <td className="text-sm text-muted">
-                    {it.importedAt ? new Date(it.importedAt).toLocaleString() : ""}
-                  </td>
                   <td className="min-w-[180px]">
                     <div className="flex gap-2">
                       <a className="btn btn-sm" href={`/products/${getPid(it.productId)}`}>See Details</a>
@@ -97,7 +97,7 @@ export default function MyImports() {
 
               {items.length === 0 && (
                 <tr>
-                  <td colSpan="4" className="text-center py-10 text-muted">
+                  <td colSpan="5" className="text-center py-10 text-muted">
                     No imports found.
                   </td>
                 </tr>

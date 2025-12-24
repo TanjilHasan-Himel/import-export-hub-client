@@ -14,7 +14,7 @@ function ProductCard({ p }) {
   const id = p._id || p.id;
 
   return (
-    <div className="cardx overflow-hidden">
+    <div className="cardx overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:ring-1 hover:ring-primary/30">
       <img className="h-44 w-full object-cover" src={img} alt={title} />
       <div className="p-5">
         <h3 className="font-extrabold text-lg">{title}</h3>

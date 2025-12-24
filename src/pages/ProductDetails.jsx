@@ -90,25 +90,31 @@ export default function ProductDetails() {
 
   return (
     <div className="card p-6 md:p-8">
-      <div className="grid md:grid-cols-2 gap-6">
-        <img
-          src={p.coverPhoto || "https://i.ibb.co/0jZQZ7W/user.png"}
-          alt={p.title}
-          className="w-full h-64 md:h-full object-cover rounded-2xl border border-black/10 dark:border-white/10"
-        />
+      <div className="grid md:grid-cols-12 gap-6">
+        {/* Left: Tall image (sticky to create an L-shape feel) */}
+        <div className="md:col-span-5">
+          <div className="md:sticky md:top-6">
+            <img
+              src={p.coverPhoto || "https://i.ibb.co/0jZQZ7W/user.png"}
+              alt={p.title}
+              className="w-full h-72 md:h-[520px] object-cover rounded-2xl border border-black/10 dark:border-white/10"
+            />
+          </div>
+        </div>
 
-        <div>
-          <h1 className="text-2xl md:text-3xl font-extrabold">{p.title}</h1>
-          <p className="text-muted mt-2">{p.description}</p>
-
-          <div className="mt-4 flex flex-wrap gap-2">
-            <span className="badge badge-outline">Category: {p.category}</span>
-            <span className="badge badge-outline">Rating: {p.rating}</span>
-            <span className="badge badge-outline">Qty: {p.quantity}</span>
-            <span className="badge badge-outline">৳ {p.price}</span>
+        {/* Right: Segmented content */}
+        <div className="md:col-span-7 space-y-5">
+          <div className="card p-5">
+            <h1 className="text-2xl md:text-3xl font-extrabold">{p.title}</h1>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <span className="badge badge-outline">Category: {p.category}</span>
+              <span className="badge badge-outline">Rating: {p.rating}</span>
+              <span className="badge badge-outline">Qty: {p.quantity}</span>
+              <span className="badge badge-outline">৳ {p.price}</span>
+            </div>
           </div>
 
-          <div className="mt-6 card p-5">
+          <div className="card p-5">
             <h3 className="font-extrabold">Import this product</h3>
 
             <div className="mt-3 flex gap-3 items-center">
@@ -119,7 +125,7 @@ export default function ProductDetails() {
                 max={Number(p.quantity || 0)}
                 value={qty}
                 onChange={(e) => setQty(e.target.value)}
-                style={{ maxWidth: 120 }}
+                style={{ maxWidth: 140 }}
               />
               <button
                 className="btn btn-primary"
@@ -142,12 +148,31 @@ export default function ProductDetails() {
             )}
           </div>
 
+          {!!p.description && (
+            <div className="card p-5">
+              <h3 className="font-extrabold">Description</h3>
+              <div className="mt-3 space-y-2 text-sm text-muted leading-relaxed">
+                {p.description
+                  .split(/\n|\.|\u2022|\-/)
+                  .map((d, idx) => d.trim())
+                  .filter(Boolean)
+                  .slice(0, 12)
+                  .map((line, i) => (
+                    <div key={i} className="flex gap-2">
+                      <span className="mt-1 h-1.5 w-1.5 rounded-full bg-base-content/40" />
+                      <p>{line}</p>
+                    </div>
+                  ))}
+
+                </div>
+              </div>
+            )}
           {!!p.promoVideo && (
-            <div className="mt-6">
+            <div className="card p-0 overflow-hidden">
               <video
                 src={p.promoVideo}
                 controls
-                className="w-full rounded-2xl border border-black/10 dark:border-white/10"
+                className="w-full"
               />
             </div>
           )}
