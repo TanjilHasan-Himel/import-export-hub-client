@@ -2,8 +2,7 @@ import { useContext, useState } from "react";
 import toast from "react-hot-toast";
 import useTitle from "../hooks/useTitle";
 import { AuthContext } from "../providers/AuthProvider";
-
-const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
+import { API_BASE } from "../utils/api";
 
 export default function AddExport() {
   useTitle("Add Export");
@@ -33,7 +32,7 @@ export default function AddExport() {
         createdAt: new Date().toISOString(),
       };
 
-      const res = await fetch(`${API}/products`, {
+      const res = await fetch(`${API_BASE}/products`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify(payload),

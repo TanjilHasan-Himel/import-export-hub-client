@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import useTitle from "../hooks/useTitle";
-
-const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
+import { API_BASE } from "../utils/api";
 
 // ✅ normalize: server data যেভাবেই আসুক (title/name, coverPhoto/image, quantity/qty)
 const normalizeProduct = (p) => ({
@@ -25,7 +24,7 @@ export default function AllProducts() {
     const load = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`${API}/products?sort=latest`);
+        const res = await fetch(`${API_BASE}/products?sort=latest`);
         const data = await res.json();
         const arr = Array.isArray(data) ? data.map(normalizeProduct) : [];
         setItems(arr.filter((x) => x._id));

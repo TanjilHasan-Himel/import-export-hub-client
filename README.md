@@ -1,16 +1,36 @@
-# React + Vite
+# ImportExportHub (Client)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Live Site: https://YOUR-LIVE-SITE-URL
 
-Currently, two official plugins are available:
+ImportExportHub is a modern web platform to manage exports, browse global products, and import any product into your personal "My Imports" section.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
+- Clean UI with responsive design (mobile, tablet, desktop).
+- Firebase Auth: Email/Password + Google social login.
+- Private routes: `Product Details`, `Add Export`, `My Exports`, `My Imports`.
+- Real-time import quantity checks and stock reduction.
+- Search by product name on All Products page.
 
-## React Compiler
+## Environment Setup
+Create a `.env.local` file in `client/` with:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```
+VITE_API_URL=https://YOUR-SERVER-URL
+VITE_API_KEY=YOUR_FIREBASE_API_KEY
+VITE_AUTH_DOMAIN=YOUR_FIREBASE_AUTH_DOMAIN
+VITE_PROJECT_ID=YOUR_FIREBASE_PROJECT_ID
+VITE_STORAGE_BUCKET=YOUR_FIREBASE_STORAGE_BUCKET
+VITE_MESSAGING_SENDER_ID=YOUR_FIREBASE_MESSAGING_SENDER_ID
+VITE_APP_ID=YOUR_FIREBASE_APP_ID
+```
 
-## Expanding the ESLint configuration
+Note: `VITE_API_URL` must point to your hosted server (e.g., Vercel). The app avoids using `localhost` in production.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Run Locally
+```bash
+cd client
+npm install
+npm run dev
+```
+
+Ensure the server is running locally on `http://localhost:5000` or set `VITE_API_URL` accordingly.

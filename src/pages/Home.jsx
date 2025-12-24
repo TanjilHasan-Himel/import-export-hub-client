@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import HeroVideo from "../components/HeroVideo";
 import toast from "react-hot-toast";
-
-const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
+import { API_BASE } from "../utils/api";
 
 function ProductCard({ p }) {
   const title = p.name || p.title || "Untitled";
@@ -44,7 +43,7 @@ export default function Home() {
     const load = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`${API}/products?limit=6&sort=latest`);
+        const res = await fetch(`${API_BASE}/products?limit=6&sort=latest`);
         const data = await res.json();
         if (!Array.isArray(data)) throw new Error("Invalid data");
         setLatest(data);

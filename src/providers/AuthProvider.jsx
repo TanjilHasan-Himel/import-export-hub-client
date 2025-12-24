@@ -45,6 +45,8 @@ export default function AuthProvider({ children }) {
         user,
         loading,
         createUser,
+        // Alias to match Register.jsx usage
+        signUp: (email, password) => createUserWithEmailAndPassword(auth, email, password),
         signIn,
         googleSignIn,
         updateUserProfile,

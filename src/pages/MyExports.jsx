@@ -2,8 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import useTitle from "../hooks/useTitle";
 import { AuthContext } from "../providers/AuthProvider";
-
-const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
+import { API_BASE } from "../utils/api";
 
 export default function MyExports() {
   useTitle("My Exports");
@@ -11,7 +10,7 @@ export default function MyExports() {
   const [items, setItems] = useState([]);
 
   const load = async () => {
-    const res = await fetch(`${API}/products?exporterEmail=${user?.email}`);
+    const res = await fetch(`${API_BASE}/exports?email=${user?.email}`);
     const data = await res.json();
     setItems(Array.isArray(data) ? data : []);
   };
@@ -21,8 +20,7 @@ export default function MyExports() {
   }, [user?.email]);
 
   const onDelete = async (id) => {
-    if (!confirm("Delete this export?")) return;
-    const res = await fetch(`${API}/products/${id}`, { method: "DELETE" });
+    const res = await fetch(`${API_BASE}/products/${id}?email=${encodeURIComponent(user?.email)}`, { method: "DELETE" });
     const data = await res.json();
     if (!res.ok) return toast.error(data?.message || "Delete failed");
     toast.success("Deleted!");

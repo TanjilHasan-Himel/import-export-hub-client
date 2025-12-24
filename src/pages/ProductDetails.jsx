@@ -3,8 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { AuthContext } from "../providers/AuthProvider";
 import useTitle from "../hooks/useTitle";
-
-const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
+import { API_BASE } from "../utils/api";
 
 const normalizeProduct = (p) => ({
   _id: p?._id || p?.id,
@@ -32,7 +31,7 @@ export default function ProductDetails() {
   const [loading, setLoading] = useState(true);
 
   const reload = async () => {
-    const res = await fetch(`${API}/products/${id}`);
+    const res = await fetch(`${API_BASE}/products/${id}`);
     const data = await res.json();
     setP(normalizeProduct(data));
   };
@@ -65,7 +64,7 @@ export default function ProductDetails() {
     if (!importQty || importQty <= 0) return toast.error("Invalid qty");
 
     try {
-      const res = await fetch(`${API}/imports`, {
+      const res = await fetch(`${API_BASE}/imports`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
@@ -117,14 +116,24 @@ export default function ProductDetails() {
                 className="inp"
                 type="number"
                 min="1"
+                max={Number(p.quantity || 0)}
                 value={qty}
                 onChange={(e) => setQty(e.target.value)}
                 style={{ maxWidth: 120 }}
               />
-              <button className="btn btn-primary" onClick={handleImport}>
+              <button
+                className="btn btn-primary"
+                onClick={handleImport}
+                disabled={Number(qty) > Number(p.quantity || 0)}
+              >
                 Import Now
               </button>
             </div>
+            {Number(qty) > Number(p.quantity || 0) && (
+              <p className="text-xs text-error mt-2">
+                Quantity exceeds available stock. Reduce the amount.
+              </p>
+            )}
 
             {!user && (
               <p className="text-xs text-muted mt-2">
