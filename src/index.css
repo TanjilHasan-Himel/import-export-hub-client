@@ -3,13 +3,29 @@
 @tailwind utilities;
 
 html, body, #root { height: 100%; }
-body { margin: 0; }
+body { 
+  margin: 0;
+  @apply bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-50;
+}
 
 @layer components{
   .container-max{
     @apply max-w-6xl mx-auto px-4;
   }
   .cardx{
-    @apply rounded-2xl border border-base-300 bg-base-100 shadow-sm;
+    @apply rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm;
+  }
+  
+  /* Ensure proper text colors in all elements */
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-gray-900 dark:text-white;
+  }
+  
+  p, span, li, a {
+    @apply text-gray-900 dark:text-gray-100;
+  }
+  
+  input, textarea, select {
+    @apply bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600;
   }
 }
